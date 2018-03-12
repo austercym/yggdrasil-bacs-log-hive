@@ -1,0 +1,308 @@
+  <configuration>
+    
+    <property>
+      <name>fs.defaultFS</name>
+      <value>hdfs://hdp-node1.localdomain:8020</value>
+      <final>true</final>
+    </property>
+    
+    <property>
+      <name>fs.trash.interval</name>
+      <value>360</value>
+    </property>
+    
+    <property>
+      <name>ha.failover-controller.active-standby-elector.zk.op.retries</name>
+      <value>120</value>
+    </property>
+    
+    <property>
+      <name>ha.zookeeper.acl</name>
+      <value>sasl:nn:rwcda</value>
+    </property>
+    
+    <property>
+      <name>hadoop.custom-extensions.root</name>
+      <value>/hdp/ext/2.6/hadoop</value>
+    </property>
+    
+    <property>
+      <name>hadoop.http.authentication.simple.anonymous.allowed</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.ambari-server-odin_cluster.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.ambari-server-odin_cluster.hosts</name>
+      <value>hdp-node1.localdomain</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.falcon.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.falcon.hosts</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.hbase.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.hbase.hosts</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.hcat.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.hcat.hosts</name>
+      <value>hdp-node3.localdomain,hdp-node6.localdomain,hdp-node8.localdomain</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.hdfs.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.hdfs.hosts</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.hive.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.hive.hosts</name>
+      <value>hdp-node3.localdomain,hdp-node4.localdomain,hdp-node6.localdomain,hdp-node7.localdomain,hdp-node8.localdomain</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.HTTP.groups</name>
+      <value>users</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.HTTP.hosts</name>
+      <value>hdp-node3.localdomain,hdp-node5.localdomain,hdp-node6.localdomain,hdp-node7.localdomain,hdp-node8.localdomain</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.kms.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.knox.groups</name>
+      <value>users</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.knox.hosts</name>
+      <value>hdp-node1.localdomain</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.livy.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.livy.hosts</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.oozie.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.oozie.hosts</name>
+      <value>hdp-node3.localdomain</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.yarn.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.yarn.hosts</name>
+      <value>hdp-node1.localdomain,hdp-node4.localdomain</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.zeppelin-odin_cluster.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.zeppelin-odin_cluster.hosts</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.zeppelin.groups</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.proxyuser.zeppelin.hosts</name>
+      <value>*</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.auth_to_local</name>
+      <value>RULE:[1:$1@$0](ambari-qa-odin_cluster@ORWELLG.LOCAL)s/.*/ambari-qa/
+RULE:[1:$1@$0](druid@ORWELLG.LOCAL)s/.*/druid/
+RULE:[1:$1@$0](hbase-odin_cluster@ORWELLG.LOCAL)s/.*/hbase/
+RULE:[1:$1@$0](hdfs-odin_cluster@ORWELLG.LOCAL)s/.*/hdfs/
+RULE:[1:$1@$0](spark-odin_cluster@ORWELLG.LOCAL)s/.*/spark/
+RULE:[1:$1@$0](zeppelin-odin_cluster@ORWELLG.LOCAL)s/.*/zeppelin/
+RULE:[1:$1@$0](.*@ORWELLG.LOCAL)s/@.*//
+RULE:[2:$1@$0](activity_analyzer@ORWELLG.LOCAL)s/.*/activity_analyzer/
+RULE:[2:$1@$0](activity_explorer@ORWELLG.LOCAL)s/.*/activity_explorer/
+RULE:[2:$1@$0](amshbase@ORWELLG.LOCAL)s/.*/ams/
+RULE:[2:$1@$0](amszk@ORWELLG.LOCAL)s/.*/ams/
+RULE:[2:$1@$0](dn@ORWELLG.LOCAL)s/.*/hdfs/
+RULE:[2:$1@$0](falcon@ORWELLG.LOCAL)s/.*/falcon/
+RULE:[2:$1@$0](hbase@ORWELLG.LOCAL)s/.*/hbase/
+RULE:[2:$1@$0](hive@ORWELLG.LOCAL)s/.*/hive/
+RULE:[2:$1@$0](jhs@ORWELLG.LOCAL)s/.*/mapred/
+RULE:[2:$1@$0](jn@ORWELLG.LOCAL)s/.*/hdfs/
+RULE:[2:$1@$0](knox@ORWELLG.LOCAL)s/.*/knox/
+RULE:[2:$1@$0](livy@ORWELLG.LOCAL)s/.*/livy/
+RULE:[2:$1@$0](nfs@ORWELLG.LOCAL)s/.*/hdfs/
+RULE:[2:$1@$0](nm@ORWELLG.LOCAL)s/.*/yarn/
+RULE:[2:$1@$0](nn@ORWELLG.LOCAL)s/.*/hdfs/
+RULE:[2:$1@$0](oozie@ORWELLG.LOCAL)s/.*/oozie/
+RULE:[2:$1@$0](rangeradmin@ORWELLG.LOCAL)s/.*/ranger/
+RULE:[2:$1@$0](rangerkms@ORWELLG.LOCAL)s/.*/keyadmin/
+RULE:[2:$1@$0](rangertagsync@ORWELLG.LOCAL)s/.*/rangertagsync/
+RULE:[2:$1@$0](rangerusersync@ORWELLG.LOCAL)s/.*/rangerusersync/
+RULE:[2:$1@$0](rm@ORWELLG.LOCAL)s/.*/yarn/
+RULE:[2:$1@$0](yarn@ORWELLG.LOCAL)s/.*/yarn/
+DEFAULT</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.authentication</name>
+      <value>kerberos</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.authorization</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.group.mapping</name>
+      <value>org.apache.hadoop.security.LdapGroupsMapping</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.group.mapping.ldap.base</name>
+      <value>dc=orwellg,dc=local</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.group.mapping.ldap.bind.password</name>
+      <value>ldapservice1029</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.group.mapping.ldap.bind.user</name>
+      <value>cn=Manager,dc=orwellg,dc=local</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.group.mapping.ldap.search.attr.group.name</name>
+      <value>cn</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.group.mapping.ldap.search.attr.member</name>
+      <value>member</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.group.mapping.ldap.search.filter.group</name>
+      <value>(objectclass=groupOfNames)</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.group.mapping.ldap.search.filter.user</name>
+      <value>(&amp;amp;(|(objectclass=person)(objectclass=applicationProcess))(cn={0}))</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.group.mapping.ldap.url</name>
+      <value>ldap://54.38.36.186:389/dc=orwellg,dc=local</value>
+    </property>
+    
+    <property>
+      <name>hadoop.security.key.provider.path</name>
+      <value>kms://http@hdp-node1.localdomain:9292/kms</value>
+    </property>
+    
+    <property>
+      <name>io.compression.codecs</name>
+      <value>org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec,org.apache.hadoop.io.compress.SnappyCodec</value>
+    </property>
+    
+    <property>
+      <name>io.file.buffer.size</name>
+      <value>131072</value>
+    </property>
+    
+    <property>
+      <name>io.serializations</name>
+      <value>org.apache.hadoop.io.serializer.WritableSerialization</value>
+    </property>
+    
+    <property>
+      <name>ipc.client.connect.max.retries</name>
+      <value>50</value>
+    </property>
+    
+    <property>
+      <name>ipc.client.connection.maxidletime</name>
+      <value>30000</value>
+    </property>
+    
+    <property>
+      <name>ipc.client.idlethreshold</name>
+      <value>8000</value>
+    </property>
+    
+    <property>
+      <name>ipc.server.tcpnodelay</name>
+      <value>true</value>
+    </property>
+    
+    <property>
+      <name>mapreduce.jobtracker.webinterface.trusted</name>
+      <value>false</value>
+    </property>
+    
+    <property>
+      <name>net.topology.script.file.name</name>
+      <value>/etc/hadoop/conf/topology_script.py</value>
+    </property>
+    
+  </configuration>

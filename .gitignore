@@ -198,6 +198,6 @@ cmake-build-debug/
 .DS_Store
 
 # Maven
-log/
+logs/
 target/
 /temp
