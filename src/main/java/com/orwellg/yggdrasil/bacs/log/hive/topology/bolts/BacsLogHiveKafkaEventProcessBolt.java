@@ -73,7 +73,7 @@ public class BacsLogHiveKafkaEventProcessBolt extends KafkaEventProcessBolt {
         if (time == null) {
             return null;
         }
-        LocalDateTime dt = LocalDateTime.ofInstant(Instant.ofEpochSecond(time), ZoneId.of("UTC"));
+        LocalDateTime dt = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.of("UTC"));
 
         return GetDateTimeString(dt);
     }

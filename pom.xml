@@ -6,7 +6,7 @@
 
     <groupId>com.orwellg</groupId>
     <artifactId>yggdrasil-bacs-log-hive</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <description>Topology to write hermod-bacs logs in Hive</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -154,18 +154,22 @@
         <profile>
             <id>dev</id>
             <properties>
-                <zookeeper.host>localhost:2181</zookeeper.host>
-                <kafka.bootstrap.host>localhost:9092,localhost:10092</kafka.bootstrap.host>
-            </properties>
-        </profile>
-        <!-- Production environment @ production server -->
-        <profile>
-            <id>production</id>
-            <properties>
                 <zookeeper.host>hdf-node1:2181,hdf-node2:2181,hdf-node3:2181</zookeeper.host>
                 <kafka.bootstrap.host>kafka-node1:6668,kafka-node2:6668,kafka-node3:6668,kafka-node4:6668,kafka-node5:6668,kafka-node6:6668</kafka.bootstrap.host>
                 <hive.metastore.host>thrift://hdp-node3.localdomain:9083</hive.metastore.host>
             </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources/dev</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+            </build>
 
             <dependencies>
                 <dependency>
@@ -184,11 +188,126 @@
                         </exclusion>
                     </exclusions>
                 </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>dev1</id>
+            <properties>
+                <zookeeper.host>hdf-node1:2181,hdf-node2:2181,hdf-node3:2181</zookeeper.host>
+                <kafka.bootstrap.host>kafka-node1:6668,kafka-node2:6668,kafka-node3:6668,kafka-node4:6668,kafka-node5:6668,kafka-node6:6668</kafka.bootstrap.host>
+                <hive.metastore.host>thrift://hdp-node3.localdomain:9083</hive.metastore.host>
+            </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources/dev1</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+            </build>
+
+            <dependencies>
                 <dependency>
                     <groupId>org.apache.storm</groupId>
-                    <artifactId>storm-cassandra</artifactId>
+                    <artifactId>storm-core</artifactId>
                     <version>${storm.version}</version>
                     <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>log4j</groupId>
+                            <artifactId>log4j</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>qa</id>
+            <properties>
+                <zookeeper.host>hdf-node1:2181,hdf-node2:2181,hdf-node3:2181</zookeeper.host>
+                <kafka.bootstrap.host>kafka-node1:6668,kafka-node2:6668,kafka-node3:6668,kafka-node4:6668,kafka-node5:6668,kafka-node6:6668</kafka.bootstrap.host>
+                <hive.metastore.host>thrift://hdp-node3.localdomain:9083</hive.metastore.host>
+            </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources/qa</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+            </build>
+
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.storm</groupId>
+                    <artifactId>storm-core</artifactId>
+                    <version>${storm.version}</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>log4j</groupId>
+                            <artifactId>log4j</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
+        </profile>
+
+
+        <!-- Production environment @ production server -->
+        <profile>
+            <id>production</id>
+            <properties>
+                <zookeeper.host>hdf-node1:2181,hdf-node2:2181,hdf-node3:2181</zookeeper.host>
+                <kafka.bootstrap.host>kafka-node1:6668,kafka-node2:6668,kafka-node3:6668,kafka-node4:6668,kafka-node5:6668,kafka-node6:6668</kafka.bootstrap.host>
+                <hive.metastore.host>thrift://hdp-node3.localdomain:9083</hive.metastore.host>
+            </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources/production</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.storm</groupId>
+                    <artifactId>storm-core</artifactId>
+                    <version>${storm.version}</version>
+                    <scope>provided</scope>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.slf4j</groupId>
+                            <artifactId>slf4j-log4j12</artifactId>
+                        </exclusion>
+                        <exclusion>
+                            <groupId>log4j</groupId>
+                            <artifactId>log4j</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>

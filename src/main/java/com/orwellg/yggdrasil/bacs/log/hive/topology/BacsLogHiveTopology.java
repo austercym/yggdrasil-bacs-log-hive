@@ -6,9 +6,10 @@ import com.orwellg.umbrella.commons.storm.topology.component.bolt.EventErrorBolt
 import com.orwellg.umbrella.commons.storm.topology.component.spout.KafkaSpout;
 import com.orwellg.umbrella.commons.storm.wrapper.kafka.KafkaBoltWrapper;
 import com.orwellg.umbrella.commons.storm.wrapper.kafka.KafkaSpoutWrapper;
-import com.orwellg.umbrella.commons.utils.config.ZookeeperUtils;
 import com.orwellg.yggdrasil.bacs.log.hive.topology.bolts.BacsLogHiveKafkaEventProcessBolt;
-import com.orwellg.yggdrasil.bacs.log.hive.topology.config.LogHiveOptions;
+import com.orwellg.yggdrasil.bacs.log.hive.topology.config.BacsLogHiveConfig;
+import com.orwellg.yggdrasil.bacs.log.hive.topology.config.BacsLogHiveConfigFactory;
+import com.orwellg.yggdrasil.bacs.log.hive.topology.config.BacsLogHiveOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.storm.Config;
@@ -29,22 +30,15 @@ import org.apache.storm.topology.TopologyBuilder;
  */
 public class BacsLogHiveTopology {
     private final static Logger LOG = LogManager.getLogger(BacsLogHiveTopology.class);
-    private static final String TOPOLOGY_NAME = "yggdrasil-bacs-log-hive";
+    private static final String TOPOLOGY_NAME = "yggdrasil-bacs-log-hive-dev";
     private static final String KAFKA_EVENT_READER_COMPONENT = "logReader";
     private static final String PROCESS_COMPONENT = "logProcessEvent";
     private static final String SAVE_TO_HIVE_COMPONENT = "logSaveToHive";
     private static final String ERROR_HANDLING = "logErrorHandling";
     private static final String ERROR_PRODUCER_COMPONENT = "logErrorProducer";
 
-    /**
-     * Set up log to hive topology and load it into storm.
-     *
-     * @param args
-     * @throws Exception
-     */
     public static void main(String[] args) throws Exception {
         boolean local = false;
-        String zookeeperHost = "";
 
         if (args.length >= 1 && args[0].equals("local")) {
             LOG.info("*********** Local parameter received, will work with LocalCluster ************");
@@ -52,49 +46,33 @@ public class BacsLogHiveTopology {
         }
 
         if (local) {
+            BacsLogHiveConfigFactory.initBacsLogHiveConfig();
             LocalCluster cluster = new LocalCluster();
             loadTopologyInStorm(cluster);
             Thread.sleep(6000000);
             cluster.shutdown();
-            ZookeeperUtils.close();
+            BacsLogHiveConfigFactory.getBacsLogHiveConfig().close();
         } else {
-            if(args.length >= 1) {
-                zookeeperHost = args[0];
-                LOG.info("*********** Set Zookeeper host by parameter {} ************", zookeeperHost);
-                loadTopologyInStorm(zookeeperHost);
-            }
-            else {
-                LOG.info("*********** Set topology with default properties ************");
-                loadTopologyInStorm();
-            }
+            loadTopologyInStorm();
         }
     }
-    public static void loadTopologyInStorm(LocalCluster cluster) throws Exception {
-        loadTopologyInStorm(cluster, null, null);
-    }
-    public static void loadTopologyInStorm(String zookeeperhost) throws Exception {
-        loadTopologyInStorm(null, zookeeperhost, null);
-    }
-    public static void loadTopologyInStorm() throws Exception {
-        loadTopologyInStorm(null, null, null);
-    }
-    /**
-     * Set up log to hive topology and load into storm.<br/>
-     * It may take some 2min to execute synchronously, then another some 2min to
-     * completely initialize storm asynchronously.<br/>
-     * Pre: kafka+zookeeper servers up in addresses as defined in TopologyConfig.
-     *
-     * @param localCluster
-     *            null to submit to remote cluster.
-     */
-    public static void loadTopologyInStorm(LocalCluster localCluster, String zookeeperHost, String propertyFile) throws Exception {
-        LOG.info("Creating {} topology...", TOPOLOGY_NAME);
 
-        // ------------ Configuration ------------
+    public static void loadTopologyInStorm() throws Exception {
+        loadTopologyInStorm(null);
+    }
+
+    public static void loadTopologyInStorm(LocalCluster localCluster) throws Exception {
+        LOG.info("Creating BACS inbound hive Topology");
+
         // Read configuration params from topology.properties and zookeeper
-        TopologyConfig config = TopologyConfigFactory.getTopologyConfig(propertyFile, zookeeperHost);
+        TopologyConfig config = TopologyConfigFactory.getTopologyConfig();
+        BacsLogHiveConfig bacsConfig = BacsLogHiveConfigFactory.getBacsLogHiveConfig();
+        String topologyName = bacsConfig.getTopologyName();
+        LOG.info("*********** topology name: {}  ************", topologyName);
+        LOG.info("*********** database name: {}  ************", bacsConfig.getDatabaseName());
+
         TopologyBuilder builder = new TopologyBuilder();
-        HiveBolt hiveBolt = getHiveBolt();
+        HiveBolt hiveBolt = getHiveBolt(bacsConfig.getDatabaseName(),bacsConfig.getTableName());
 
         // Create the spout that read the events from Kafka
         builder.setSpout(KAFKA_EVENT_READER_COMPONENT, new KafkaSpoutWrapper(config.getKafkaSubscriberSpoutConfig(),
@@ -121,25 +99,26 @@ public class BacsLogHiveTopology {
 
         // ------------ Build the topology ------------
         StormTopology topology = builder.createTopology();
-
-        LOG.info("{} Topology created, submitting it to storm...", TOPOLOGY_NAME);
+        LOG.info("Bacs Hive Log Topology created");
 
         // Create the basic config and upload the topology
         Config conf = new Config();
         conf.setDebug(false);
-        conf.setMaxTaskParallelism(config.getTopologyMaxTaskParallelism());
         conf.setNumWorkers(config.getTopologyNumWorkers());
+        conf.setMaxTaskParallelism(config.getTopologyMaxTaskParallelism());
 
         if (localCluster != null) {
-            localCluster.submitTopology(TOPOLOGY_NAME, conf, topology);
-            LOG.info("{} Topology submitted to storm (LocalCluster).", TOPOLOGY_NAME);
+            localCluster.submitTopology(topologyName, conf, topology);
+            LOG.info("Bacs Log Hive Topology submitted to storm (LocalCluster).");
         } else {
-            StormSubmitter.submitTopology(TOPOLOGY_NAME, conf, topology);
-            LOG.info("{} Party Topology submitted to storm (StormSubmitter).", TOPOLOGY_NAME);
+            StormSubmitter.submitTopology(topologyName, conf, topology);
+            LOG.info("Bacs Log Hive submitted to storm (StormSubmitter).");
         }
+
     }
-    public static HiveBolt getHiveBolt() {
-        HiveOptions hiveOptions = LogHiveOptions.hiveOptions();
+
+    public static HiveBolt getHiveBolt(String dbName, String table) {
+        HiveOptions hiveOptions = BacsLogHiveOptions.hiveOptions(dbName, table);
         return new HiveBolt(hiveOptions);
     }
 }

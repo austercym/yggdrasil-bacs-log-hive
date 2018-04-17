@@ -6,21 +6,20 @@ import org.apache.storm.hive.bolt.mapper.DelimitedRecordHiveMapper;
 import org.apache.storm.hive.common.HiveOptions;
 import org.apache.storm.tuple.Fields;
 
-public class LogHiveOptions {
-    private static String logsDatabase = "bacs";
-    private static String logsTable = "logs";
+public class BacsLogHiveOptions {
+    //private static String bacsDatabase = "bacs_qa";
+    //private static String bacsTransactionTable = "credittransactioninformation";
 
-    public static HiveOptions hiveOptions() {
+    public static HiveOptions hiveOptions(String bacsDatabase, String bacsLogTable) {
         TopologyConfig config = TopologyConfigFactory.getTopologyConfig();
 
         // Hive connection configuration
         String metaStoreURI = config.getHiveConfig().getHiveParams().getHost()+":"+config.getHiveConfig().getHiveParams().getPort();
-//        String metaStoreURI = "thrift://localhost:10000";
-        String dbName = logsDatabase;
-        String tblName = logsTable;
+
+        String dbName = bacsDatabase;
+        String tblName = bacsLogTable;
         // Fields for possible column data
-        String[] colNames = {
-                "id","instance","loglevel","component","message","errormessage","trace","logtimestamp"};
+        String[] colNames = {"id","instance","loglevel","component","message","errormessage","trace","logtimestamp"};
 
         // Record Writer configuration
         DelimitedRecordHiveMapper mapper = new DelimitedRecordHiveMapper()
