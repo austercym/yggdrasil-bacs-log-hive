@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.orwellg</groupId>
+    <groupId>com.orwellg.yggdrasil</groupId>
     <artifactId>yggdrasil-bacs-log-hive</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
     <description>Topology to write hermod-bacs logs in Hive</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
