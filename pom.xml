@@ -6,7 +6,7 @@
 
     <groupId>com.orwellg.yggdrasil</groupId>
     <artifactId>yggdrasil-bacs-log-hive</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>yggdrasil-bacs-log-hive</name>
     <description>Topology to write hermod-bacs logs in Hive</description>
     <properties>
