@@ -6,36 +6,46 @@
 
     <groupId>com.orwellg.yggdrasil</groupId>
     <artifactId>yggdrasil-bacs-log-hive</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
-    <name>yggdrasil-bacs-log-hive</name>
+    <version>0.0.2</version>
+    <name>yggdrasil-bacs-log-hive-dev</name>
     <description>Topology to write hermod-bacs logs in Hive</description>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <storm.version>1.1.0</storm.version>
-        <storm.version.hive>1.2.0.3.1.0.0-383</storm.version.hive>
-        <kafka.clients.version>0.11.0.0</kafka.clients.version>
-        <yggdrasil.version>0.0.3</yggdrasil.version>
+
+        <storm.version>1.1.1</storm.version>
+        <storm.version.hive>1.2.0.3.1.0.0-558</storm.version.hive>
+        <kafka.clients.version>1.0.1</kafka.clients.version>
+        <umbrella.storm>0.1.0</umbrella.storm>
+        <umbrella.types>0.0.8</umbrella.types>
+        <umbrella.commons>0.0.8</umbrella.commons>
+        <umbrella.nosql>0.0.3</umbrella.nosql>
+        <yggdrasil.commons>0.0.5</yggdrasil.commons>
+        <yggdrasil.storm>0.0.2</yggdrasil.storm>
+        <junit.version>4.12</junit.version>
+
         <storm.topology>com.orwellg.yggdrasil.bacs.log.hive.topology.BacsLogHiveTopology</storm.topology>
-        <zookeeper.host>localhost:2181</zookeeper.host>
+
+        <!--<zookeeper.host>localhost:2181</zookeeper.host>-->
     </properties>
     <dependencies>
         <!-- orwell -->
         <dependency>
             <groupId>com.orwellg.umbrella</groupId>
             <artifactId>umbrella-commons</artifactId>
-            <version>0.0.8-SNAPSHOT</version>
+            <version>${umbrella.commons}</version>
         </dependency>
         <dependency>
             <groupId>com.orwellg.umbrella</groupId>
             <artifactId>umbrella-commons-storm</artifactId>
-            <version>0.0.5</version>
+            <version>${umbrella.storm}</version>
         </dependency>
         <dependency>
             <groupId>com.orwellg.yggdrasil</groupId>
             <artifactId>yggdrasil-commons</artifactId>
-            <version>${yggdrasil.version}</version>
+            <version>${yggdrasil.commons}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -81,39 +91,10 @@
         <dependency>
             <groupId>com.orwellg.umbrella</groupId>
             <artifactId>umbrella-commons-types</artifactId>
-            <version>0.0.7-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hive.hcatalog</groupId>
-            <artifactId>hive-hcatalog-streaming</artifactId>
-            <version>LATEST</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hive.hcatalog</groupId>
-            <artifactId>hive-hcatalog-core</artifactId>
-            <version>LATEST</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>${umbrella.types}</version>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -139,6 +120,39 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>java</executable>
+                    <includeProjectDependencies>true</includeProjectDependencies>
+                    <includePluginDependencies>false</includePluginDependencies>
+                    <classpathScope>compile</classpathScope>
+                    <mainClass>${storm.topology}</mainClass>
+                </configuration>
+            </plugin>
+
+            <!-- Enabling and configuring regular resources filtering. See also section
+                "resources" below -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <!-- specify UTF-8, ISO-8859-1 or any other file encoding -->
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
         </plugins>
 
         <!-- Instructing the resources plugin to filter certain directories -->
@@ -277,9 +291,7 @@
         <profile>
             <id>production</id>
             <properties>
-                <zookeeper.host>hdf-node1:2181,hdf-node2:2181,hdf-node3:2181</zookeeper.host>
-                <kafka.bootstrap.host>kafka-node1:6668,kafka-node2:6668,kafka-node3:6668,kafka-node4:6668,kafka-node5:6668,kafka-node6:6668</kafka.bootstrap.host>
-                <hive.metastore.host>thrift://hdp-node3.localdomain:9083</hive.metastore.host>
+                <zookeeper.host>hdf-g1-0.node.consul:2181,hdf-g1-1.node.consul:2181,hdf-g1-2.node.consul:2181</zookeeper.host>
             </properties>
             <build>
                 <resources>
