@@ -31,8 +31,8 @@ public class BacsLogHiveOptions {
                 .withIdleTimeout(config.getHiveConfig().getHiveParams().getIdleTimeout())
                 .withMaxOpenConnections(config.getHiveConfig().getHiveParams().getMaxOpenConnections())
                 .withCallTimeout(config.getHiveConfig().getHiveParams().getCallTimeout())
-                .withKerberosPrincipal("storm-frigg_cluster@ORWELLG.LOCAL")
-                .withKerberosKeytab("/etc/security/keytabs/storm.headless.keytab");
+                .withKerberosPrincipal("svc_bacs")
+                .withKerberosKeytab("/etc/security/keytabs/svc_bacs.keytab");
         return hiveOptions;
     }
 }
