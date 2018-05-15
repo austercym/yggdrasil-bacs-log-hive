@@ -14,7 +14,7 @@ public class BacsLogHiveOptions {
         TopologyConfig config = TopologyConfigFactory.getTopologyConfig();
 
         // Hive connection configuration
-        String metaStoreURI = config.getHiveConfig().getHiveParams().getHost()+":"+config.getHiveConfig().getHiveParams().getPort();
+        String metaStoreURI = config.getHiveConfig().getHiveParams().getHost();
 
         String dbName = bacsDatabase;
         String tblName = bacsLogTable;
