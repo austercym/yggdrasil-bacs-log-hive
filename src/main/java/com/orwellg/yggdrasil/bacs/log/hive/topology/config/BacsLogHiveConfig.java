@@ -52,18 +52,12 @@ public class BacsLogHiveConfig extends ZkConfigurationParams {
     }
 
     @Override
-    protected void loadParameters() {
+    public void loadParameters() {
 
-        DynamicPropertyFactory dynamicPropertyFactory = null;
         try {
-            dynamicPropertyFactory = ZookeeperUtils.getDynamicPropertyFactory();
+            ZookeeperUtils.getDynamicPropertyFactory();
         } catch (Exception e) {
             LOG.error("Error when try get the dynamic property factory from Zookeeper. Message: {}",  e.getMessage(), e);
-        }
-
-        if (dynamicPropertyFactory != null) {
-
-//            kafkaSpoutHints = ZookeeperUtils.getDynamicPropertyFactory().getIntProperty("yggdrasil.transaction.log.hive.hints.spout", DEFAULT_HINTS_KAFKA_SPOUT);
         }
 
     }

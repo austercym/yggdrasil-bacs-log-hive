@@ -14,7 +14,7 @@ public class BacsLogHiveOptions {
         TopologyConfig config = TopologyConfigFactory.getTopologyConfig();
 
         // Hive connection configuration
-        String metaStoreURI = config.getHiveConfig().getHiveParams().getHost();
+        String metaStoreURI = config.getHiveConfig().getHiveParams().getMetaStoreURI();
 
         String dbName = bacsDatabase;
         String tblName = bacsLogTable;
@@ -31,8 +31,8 @@ public class BacsLogHiveOptions {
                 .withIdleTimeout(config.getHiveConfig().getHiveParams().getIdleTimeout())
                 .withMaxOpenConnections(config.getHiveConfig().getHiveParams().getMaxOpenConnections())
                 .withCallTimeout(config.getHiveConfig().getHiveParams().getCallTimeout())
-                .withKerberosPrincipal("svc_bacs")
-                .withKerberosKeytab("/etc/security/keytabs/svc_bacs.keytab");
+                .withKerberosPrincipal(config.getHiveConfig().getHiveParams().getBacsKerberosPrincipal())
+                .withKerberosKeytab(config.getHiveConfig().getHiveParams().getBacsKerberosKeytab());
         return hiveOptions;
     }
 }

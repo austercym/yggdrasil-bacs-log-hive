@@ -6,7 +6,7 @@
 
     <groupId>com.orwellg.yggdrasil</groupId>
     <artifactId>yggdrasil-bacs-log-hive</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <name>yggdrasil-bacs-log-hive-dev</name>
     <description>Topology to write hermod-bacs logs in Hive</description>
 
@@ -20,7 +20,7 @@
         <kafka.clients.version>1.0.1</kafka.clients.version>
         <umbrella.storm>0.1.0</umbrella.storm>
         <umbrella.types>0.0.8</umbrella.types>
-        <umbrella.commons>0.0.8</umbrella.commons>
+        <umbrella.commons>0.2.1-SNAPSHOT</umbrella.commons>
         <umbrella.nosql>0.0.3</umbrella.nosql>
         <yggdrasil.commons>0.0.5</yggdrasil.commons>
         <yggdrasil.storm>0.0.2</yggdrasil.storm>
