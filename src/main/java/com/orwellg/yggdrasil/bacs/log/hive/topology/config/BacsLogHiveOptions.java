@@ -11,7 +11,7 @@ public class BacsLogHiveOptions {
     //private static String bacsTransactionTable = "credittransactioninformation";
 
     public static HiveOptions hiveOptions(String bacsDatabase, String bacsLogTable) {
-        TopologyConfig config = TopologyConfigFactory.getTopologyConfig();
+        BacsLogHiveConfig config = BacsLogHiveConfigFactory.getBacsLogsConfig();
 
         // Hive connection configuration
         String metaStoreURI = config.getHiveConfig().getHiveParams().getMetaStoreURI();
@@ -31,8 +31,8 @@ public class BacsLogHiveOptions {
                 .withIdleTimeout(config.getHiveConfig().getHiveParams().getIdleTimeout())
                 .withMaxOpenConnections(config.getHiveConfig().getHiveParams().getMaxOpenConnections())
                 .withCallTimeout(config.getHiveConfig().getHiveParams().getCallTimeout())
-                .withKerberosPrincipal(config.getHiveConfig().getHiveParams().getBacsKerberosPrincipal())
-                .withKerberosKeytab(config.getHiveConfig().getHiveParams().getBacsKerberosKeytab());
+                .withKerberosPrincipal(config.getHiveConfig().getHiveParams().getCoreKerberosPrincipal())
+                .withKerberosKeytab(config.getHiveConfig().getHiveParams().getCoreKerberosKeytab());
         return hiveOptions;
     }
 }

@@ -1,28 +1,35 @@
 package com.orwellg.yggdrasil.bacs.log.hive.topology.config;
 
+import com.orwellg.yggdrasil.commons.storm.topology.config.DSLTopologyConfigFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class BacsLogHiveConfigFactory {
+public class BacsLogHiveConfigFactory extends DSLTopologyConfigFactory {
     private final static Logger LOG = LogManager.getLogger(BacsLogHiveConfigFactory.class);
 
-    private static BacsLogHiveConfig bacsLogHiveConfig;
+    protected static BacsLogHiveConfig bacsLogsConfig;
 
-    public static synchronized void initBacsLogHiveConfig() {
+    public static synchronized void initBacsInboundHiveConfig(String propertiesFile) {
 
-        if (bacsLogHiveConfig == null) {
-            bacsLogHiveConfig = new BacsLogHiveConfig();
+        if (bacsLogsConfig == null) {
+            if (propertiesFile != null) {
+                LOG.info("Initializing topology with propertiesFile {}", propertiesFile);
+                bacsLogsConfig = new BacsLogHiveConfig(propertiesFile);
+            } else {
+                LOG.info("Initializing topology with propertiesFile DEFAULT_PROPERTIES_FILE");
+                bacsLogsConfig = new BacsLogHiveConfig();
+            }
             try {
-                bacsLogHiveConfig.start();
+                bacsLogsConfig.start();
             } catch (Exception e) {
-                LOG.error("The Product DSL configuration params cannot be started. The system will work with the parameters for default. Message: {}",  e.getMessage(),  e);
+                LOG.error("Topology configuration params cannot be started. The system will work with default parameters. Message: {}",  e.getMessage(),  e);
             }
         }
     }
 
-    public static synchronized BacsLogHiveConfig getBacsLogHiveConfig() {
-        initBacsLogHiveConfig();
-        return bacsLogHiveConfig;
+    public static synchronized BacsLogHiveConfig getBacsLogsConfig() {
+        initBacsInboundHiveConfig(null);
+        return bacsLogsConfig;
     }
 }
 

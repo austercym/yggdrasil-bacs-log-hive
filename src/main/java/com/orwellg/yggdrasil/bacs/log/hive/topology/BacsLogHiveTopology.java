@@ -30,7 +30,6 @@ import org.apache.storm.topology.TopologyBuilder;
  */
 public class BacsLogHiveTopology {
     private final static Logger LOG = LogManager.getLogger(BacsLogHiveTopology.class);
-    private static final String TOPOLOGY_NAME = "yggdrasil-bacs-log-hive-dev";
     private static final String KAFKA_EVENT_READER_COMPONENT = "logReader";
     private static final String PROCESS_COMPONENT = "logProcessEvent";
     private static final String SAVE_TO_HIVE_COMPONENT = "logSaveToHive";
@@ -46,12 +45,12 @@ public class BacsLogHiveTopology {
         }
 
         if (local) {
-            BacsLogHiveConfigFactory.initBacsLogHiveConfig();
+            BacsLogHiveConfigFactory.initBacsInboundHiveConfig(null);
             LocalCluster cluster = new LocalCluster();
             loadTopologyInStorm(cluster);
             Thread.sleep(6000000);
             cluster.shutdown();
-            BacsLogHiveConfigFactory.getBacsLogHiveConfig().close();
+            BacsLogHiveConfigFactory.getBacsLogsConfig().close();
         } else {
             loadTopologyInStorm();
         }
@@ -65,8 +64,7 @@ public class BacsLogHiveTopology {
         LOG.info("Creating BACS inbound hive Topology");
 
         // Read configuration params from topology.properties and zookeeper
-        TopologyConfig config = TopologyConfigFactory.getTopologyConfig();
-        BacsLogHiveConfig bacsConfig = BacsLogHiveConfigFactory.getBacsLogHiveConfig();
+        BacsLogHiveConfig bacsConfig = BacsLogHiveConfigFactory.getBacsLogsConfig();
         String topologyName = bacsConfig.getTopologyName();
         LOG.info("*********** topology name: {}  ************", topologyName);
         LOG.info("*********** database name: {}  ************", bacsConfig.getDatabaseName());
@@ -75,26 +73,26 @@ public class BacsLogHiveTopology {
         HiveBolt hiveBolt = getHiveBolt(bacsConfig.getDatabaseName(),bacsConfig.getTableName());
 
         // Create the spout that read the events from Kafka
-        builder.setSpout(KAFKA_EVENT_READER_COMPONENT, new KafkaSpoutWrapper(config.getKafkaSubscriberSpoutConfig(),
-                String.class, String.class).getKafkaSpout(),config.getKafkaSpoutHints());
+        builder.setSpout(KAFKA_EVENT_READER_COMPONENT, new KafkaSpoutWrapper(bacsConfig.getKafkaSubscriberSpoutConfig(),
+                String.class, String.class).getKafkaSpout(),bacsConfig.getKafkaSpoutHints());
 
         // Parse the events and we send it to the rest of the topology
         builder.setBolt(PROCESS_COMPONENT,
-                new BacsLogHiveKafkaEventProcessBolt(), config.getEventProcessHints())
+                new BacsLogHiveKafkaEventProcessBolt(), bacsConfig.getEventProcessHints())
                 .shuffleGrouping(KAFKA_EVENT_READER_COMPONENT, KafkaSpout.EVENT_SUCCESS_STREAM);
 
-        builder.setBolt(SAVE_TO_HIVE_COMPONENT, hiveBolt, config.getEventErrorHints()
+        builder.setBolt(SAVE_TO_HIVE_COMPONENT, hiveBolt, bacsConfig.getEventErrorHints()
         ).shuffleGrouping(PROCESS_COMPONENT);
 
         // ------------ Manage Errors ------------
         builder.setBolt(ERROR_HANDLING,
                 new EventErrorBolt(),
-                config.getEventErrorHints()
+                bacsConfig.getEventErrorHints()
         ).shuffleGrouping(KAFKA_EVENT_READER_COMPONENT,  KafkaSpout.EVENT_ERROR_STREAM);
 
         builder.setBolt(ERROR_PRODUCER_COMPONENT,
-                new KafkaBoltWrapper(config.getKafkaPublisherErrorBoltConfig(), String.class, String.class).getKafkaBolt(),
-                config.getEventErrorHints()
+                new KafkaBoltWrapper(bacsConfig.getKafkaPublisherErrorBoltConfig(), String.class, String.class).getKafkaBolt(),
+                bacsConfig.getEventErrorHints()
         ).shuffleGrouping(ERROR_HANDLING);
 
         // ------------ Build the topology ------------
@@ -104,8 +102,8 @@ public class BacsLogHiveTopology {
         // Create the basic config and upload the topology
         Config conf = new Config();
         conf.setDebug(false);
-        conf.setNumWorkers(config.getTopologyNumWorkers());
-        conf.setMaxTaskParallelism(config.getTopologyMaxTaskParallelism());
+        conf.setNumWorkers(bacsConfig.getTopologyNumWorkers());
+        conf.setMaxTaskParallelism(bacsConfig.getTopologyMaxTaskParallelism());
 
         if (localCluster != null) {
             localCluster.submitTopology(topologyName, conf, topology);
