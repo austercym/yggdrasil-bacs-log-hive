@@ -7,8 +7,6 @@ import org.apache.storm.hive.common.HiveOptions;
 import org.apache.storm.tuple.Fields;
 
 public class BacsLogHiveOptions {
-    //private static String bacsDatabase = "bacs_qa";
-    //private static String bacsTransactionTable = "credittransactioninformation";
 
     public static HiveOptions hiveOptions(String bacsDatabase, String bacsLogTable) {
         BacsLogHiveConfig config = BacsLogHiveConfigFactory.getBacsLogsConfig();
@@ -31,8 +29,14 @@ public class BacsLogHiveOptions {
                 .withIdleTimeout(config.getHiveConfig().getHiveParams().getIdleTimeout())
                 .withMaxOpenConnections(config.getHiveConfig().getHiveParams().getMaxOpenConnections())
                 .withCallTimeout(config.getHiveConfig().getHiveParams().getCallTimeout())
-                .withKerberosPrincipal(config.getHiveConfig().getHiveParams().getCoreKerberosPrincipal())
-                .withKerberosKeytab(config.getHiveConfig().getHiveParams().getCoreKerberosKeytab());
+                //uat
+                //.withKerberosPrincipal("svc_bacs@ORWELLG.UAT")
+                //.withKerberosKeytab("/etc/security/keytabs/svc_bacs.keytab");
+                //prod
+                .withKerberosPrincipal("svc_bacs")
+                .withKerberosKeytab("/etc/security/keytabs/svc_bacs.keytab");
+                //.withKerberosPrincipal(config.getHiveConfig().getHiveParams().getCoreKerberosPrincipal())
+                //.withKerberosKeytab(config.getHiveConfig().getHiveParams().getCoreKerberosKeytab());
         return hiveOptions;
     }
 }
