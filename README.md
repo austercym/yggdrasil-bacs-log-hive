@@ -8,14 +8,10 @@ Insert element in hive.
 
 ## Build
 
-mvn clean install -DskipTests -P environment (see pom.xml for defined environments), eg:
-
-mvn clean install -DskipTests -P dev
-mvn clean install -DskipTests -P production
+mvn clean install -DskipTests -P deploy
 
 ## Configuration:
 topology.properties:
-- "zookeeper.host" (set by maven profiles, see "Build").
 - Topic names (for subscriber and error).
 
 ## Upload to storm cluster in SID environment:
