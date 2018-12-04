@@ -19,14 +19,13 @@
         <storm.version>1.1.1</storm.version>
         <storm.version.hive>1.2.0.3.1.0.0-558</storm.version.hive>
         <kafka.clients.version>1.0.1</kafka.clients.version>
-        <umbrella.storm>0.1.0</umbrella.storm>
-        <umbrella.types>0.0.8</umbrella.types>
-        <umbrella.commons>0.1.4</umbrella.commons>
-        <umbrella.nosql>0.0.3</umbrella.nosql>
-        <yggdrasil.commons>0.0.5</yggdrasil.commons>
-        <yggdrasil.storm>0.0.2</yggdrasil.storm>
+        <umbrella.storm>0.4.2</umbrella.storm>
+        <umbrella.types>0.4.0</umbrella.types>
+        <umbrella.commons>0.7.0</umbrella.commons>
+        <umbrella.nosql>0.4.1</umbrella.nosql>
+        <yggdrasil.commons>1.1.1</yggdrasil.commons>
+        <yggdrasil.storm>0.1.1</yggdrasil.storm>
         <junit.version>4.12</junit.version>
-
         <storm.scope>compile</storm.scope>
     </properties>
     <dependencies>
