@@ -160,8 +160,8 @@ pipeline {
                     hostsDeploy = 'sid-hdf-g4-1.node.sid.consul'
                     nimbusHost = 'sid-hdf-g1-1.node.sid.consul'
                     zkHost = 'sid-hdf-g1-0.node.sid.consul:2181,sid-hdf-g1-1.node.sid.consul:2181,sid-hdf-g1-2.node.sid.consul:2181'
-                    mainClass = 'com.orwellg.yggdrasil-card-account-balance-update'
-                    groupId = 'com.orwellg'
+                    mainClass = 'com.orwellg.yggdrasil.bacs.log.hive.topology.BacsLogSaveToHive'
+                    groupId = 'com.orwellg.yggdrasil'
                     stormDeploy  pom.artifactId  , pom.version , groupId, kUser  ,  hostsDeploy , nimbusHost ,zkHost, mainClass
                 }
             }
