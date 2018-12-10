@@ -169,11 +169,6 @@ pipeline {
 
         }
         
-        stage('Remove_Workspace') {
-            steps {
-                deleteDir()
-            }
-        }
     }
 }
 
