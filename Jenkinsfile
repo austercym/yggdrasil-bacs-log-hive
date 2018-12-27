@@ -107,7 +107,7 @@ pipeline {
             steps {
 
                     script {
-                        rtMaven.run pom: pomPath, goals: '-U clean test -Pdeploy'
+                        rtMaven.run pom: pomPath, goals: '-U clean compile test -Pdeploy'
                     }
                 
             }
