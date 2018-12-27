@@ -129,7 +129,7 @@ pipeline {
 		}
 		steps {
 			withSonarQubeEnv('SonarQube') {
-				sh "sudo sonar-scanner -Dsonar.host.url=http://11.0.200.26:9000 -Dsonar.projectKey=${env.JOB_NAME.replace('/','_')} -Dsonar.sources=./src/main -Dsonar.tests=./src/test -Dsonar.java.binaries=."
+				sh "sudo sonar-scanner -Dsonar.host.url=http://11.0.200.26:9000 -Dsonar.projectKey=${env.JOB_NAME.replace('/','_')} -Dsonar.sources=./src/main -Dsonar.java.binaries=."
 			}
 		}
 		post {
