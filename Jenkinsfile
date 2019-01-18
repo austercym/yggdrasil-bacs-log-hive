@@ -5,6 +5,7 @@ pipeline {
 
     agent { label 'docker'}
 
+
     environment {
         ARTIFACTORY_SERVER_REF = 'artifactory'
 
@@ -21,7 +22,7 @@ pipeline {
         string(name: 'HAS_CHANGES', defaultValue: 'N')
         string(name: 'IS_MASTER', defaultValue: 'N')
     }
-
+    
     stages {
 
         stage('Pipeline setup') {
@@ -38,28 +39,7 @@ pipeline {
                     steps {
                         script {
                             triggerStarter  ((env.JOB_NAME.tokenize('/'))[0])
-                            /*withCredentials([string(credentialsId: 'github-orwell-cicd-webhook-token', variable: 'githubWebhookGenericToken')]) {
-                                properties([
-                                        pipelineTriggers([
-                                                [
-                                                        $class                   : 'GenericTrigger',
-                                                        causeString              : 'Push made',
-                                                        token                    : githubWebhookGenericToken,
-                                                        genericHeaderVariables   : [
-                                                                [key: 'X-GitHub-Event', regexpFilter: '']
-                                                        ],
-                                                        genericVariables         : [
-                                                                [key: 'project', value: '$.repository.name'],
-                                                                [key: 'branch', value: '$.ref']
-                                                        ],
-                                                        regexpFilterExpression   : (env.JOB_NAME.tokenize('/'))[0] + ',push',
-                                                        regexpFilterText         : '$project,$x_github_event',
-                                                        printContributedVariables: true,
-                                                        printPostContent         : true
-                                                ]
-                                        ])
-                                ])
-                            }*/
+                           
                         }
                     }
                 }
@@ -91,7 +71,7 @@ pipeline {
                             }
                             if (scmVars.GIT_COMMIT != scmVars.GIT_PREVIOUS_COMMIT) {
                                 env.HAS_CHANGES='Y'
-                            }
+                            }                            
                             descriptor.version = artifactVersion
                             descriptor.transform()
 
@@ -110,11 +90,11 @@ pipeline {
         }
 
         stage('Unit test') {
-           	when {
+            when {
         		expression { env.HAS_CHANGES == 'Y' }
         		beforeAgent true
       		}
-      		agent{
+            agent{
                 docker {
                     image 'maven:3-alpine'
                     args '-v $HOME/.m2:/root/.m2 --network user-default'
@@ -124,22 +104,23 @@ pipeline {
             }
             steps {
 
+                withEnv(["https_proxy=squid.service.cicd.consul:3128"]) {
                     script {
-                        rtMaven.run pom: pomPath, goals: '-U clean test -Pdeploy'
+                        rtMaven.run pom: pomPath, goals: '-U clean test -Pdeploy', buildInfo: buildInfo
                     }
-
+                }
             }
-/*
-            post {
+
+           /* post {
                   always {
                       junit 'target/surefire-reports/*.xml'
                   }
             }
-*/
+	    */
         }
 
         stage('Build') {
-           	when {
+            when {
         		expression { env.HAS_CHANGES == 'Y' }
         		beforeAgent true
       		}
@@ -165,7 +146,7 @@ pipeline {
         }
 
         stage('Publish') {
-           	when {
+            when {
         		expression { env.HAS_CHANGES == 'Y' }
         		beforeAgent true
       		}
@@ -187,9 +168,8 @@ pipeline {
             }
         }
 
-
        stage('Deploy') {
-           	when {
+            when {
         		expression { env.HAS_CHANGES == 'Y' && env.IS_MASTER == 'N' }
         		beforeAgent true
       		}
@@ -206,6 +186,9 @@ pipeline {
                     stormDeploy  pom.artifactId  , pom.version , groupId, kUser  ,  hostsDeploy , nimbusHost ,zkHost, mainClass
                 }
             }
+
+
         }
+        
     }
 }
