@@ -2,7 +2,9 @@
 
 pipeline {
 
+
     agent { label 'docker'}
+
 
     environment {
         ARTIFACTORY_SERVER_REF = 'artifactory'
@@ -14,10 +16,13 @@ pipeline {
         releaseRepository = 'libs-release-local'
         snapshotDependenciesRepository = 'libs-snapshot'
         releaseDependeciesRepository = 'libs-release'
-
-
     }
 
+	parameters {
+        string(name: 'HAS_CHANGES', defaultValue: 'N')
+        string(name: 'IS_MASTER', defaultValue: 'N')
+    }
+    
     stages {
 
         stage('Pipeline setup') {
@@ -33,28 +38,8 @@ pipeline {
                     }
                     steps {
                         script {
-                            withCredentials([string(credentialsId: 'github-orwell-cicd-webhook-token', variable: 'githubWebhookGenericToken')]) {
-                                properties([
-                                        pipelineTriggers([
-                                                [
-                                                        $class                   : 'GenericTrigger',
-                                                        causeString              : 'Push made',
-                                                        token                    : githubWebhookGenericToken,
-                                                        genericHeaderVariables   : [
-                                                                [key: 'X-GitHub-Event', regexpFilter: '']
-                                                        ],
-                                                        genericVariables         : [
-                                                                [key: 'project', value: '$.repository.name'],
-                                                                [key: 'branch', value: '$.ref']
-                                                        ],
-                                                        regexpFilterExpression   : (env.JOB_NAME.tokenize('/'))[0] + ',push',
-                                                        regexpFilterText         : '$project,$x_github_event',
-                                                        printContributedVariables: true,
-                                                        printPostContent         : true
-                                                ]
-                                        ])
-                                ])
-                            }
+                            triggerStarter  ((env.JOB_NAME.tokenize('/'))[0])
+                           
                         }
                     }
                 }
@@ -76,8 +61,16 @@ pipeline {
 
                             def  descriptor = Artifactory.mavenDescriptor()
                             descriptor.pomFile = pomPath
-                            if (!descriptor.version.endsWith('-SNAPSHOT'))
+                            def scmVars = checkout scm
+                            if (!( scmVars.GIT_BRANCH == 'master'))  {
                                 artifactVersion = artifactVersion + '-SNAPSHOT'
+                            }
+                            if ( scmVars.GIT_BRANCH == 'master')  {
+                                env.IS_MASTER='Y'
+                            }
+                            if (scmVars.GIT_COMMIT != scmVars.GIT_PREVIOUS_COMMIT) {
+                                env.HAS_CHANGES='Y'
+                            }                            
                             descriptor.version = artifactVersion
                             descriptor.transform()
 
@@ -96,6 +89,10 @@ pipeline {
         }
 
         stage('Unit test') {
+            when {
+        		expression { env.HAS_CHANGES == 'Y' }
+        		beforeAgent true
+      		}
             agent{
                 docker {
                     image 'maven:3-alpine'
@@ -106,41 +103,26 @@ pipeline {
             }
             steps {
 
+                withEnv(["https_proxy=squid.service.cicd.consul:3128"]) {
                     script {
-                        rtMaven.run pom: pomPath, goals: '-U clean compile test -Pdeploy'
-                    }
-                
-            }
-
-            post {
-                  always {
-                      junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
-                  }
-            }
-        }
-
-	stage('SonarAnalysis') {
-		agent {
-			docker {
-				image 'docker.registry.service.cicd.consul/sonarqube-scanner:latest'
-				args '-u root:root'
-				reuseNode true
-			}
-		}
-		steps {
-			withSonarQubeEnv('SonarQube') {
-				sh "sudo sonar-scanner -Dsonar.host.url=http://11.0.200.26:9000 -Dsonar.projectKey=${env.JOB_NAME.replace('/','_')} -Dsonar.sources=./src/main -Dsonar.java.binaries=."
-			}
-		}
-		post {
-                    always {
-                        echo 'inside post always sonar stage'
-			sh 'rm -rf .scannerwork'
+                        rtMaven.run pom: pomPath, goals: '-U clean test -Pdeploy', buildInfo: buildInfo
                     }
                 }
-	}
+            }
+
+           /* post {
+                  always {
+                      junit 'target/surefire-reports/*.xml'
+                  }
+            }
+	    */
+        }
 
         stage('Build') {
+            when {
+        		expression { env.HAS_CHANGES == 'Y' }
+        		beforeAgent true
+      		}
             agent{
                 docker {
                     image 'maven:3-alpine'
@@ -151,7 +133,7 @@ pipeline {
             }
             steps {
                 script {
-                    rtMaven.run pom: pomPath, goals: '-U clean package -Pdeploy', buildInfo: buildInfo
+                    rtMaven.run pom: pomPath, goals: '-U clean package -DskipTests -Pdeploy', buildInfo: buildInfo
                 }
             }
 
@@ -163,16 +145,33 @@ pipeline {
         }
 
         stage('Publish') {
+            when {
+        		expression { env.HAS_CHANGES == 'Y' }
+        		beforeAgent true
+      		}
+            agent{
+                docker {
+                    image 'maven:3-alpine'
+                    args '-v $HOME/.m2:/root/.m2 --network user-default'
+                    reuseNode true
+                    label 'docker'
+                }
+            }
+
             steps {
                 script {
                     server.publishBuildInfo buildInfo
                     rtMaven.deployer.deployArtifacts buildInfo
                 }
+
             }
         }
 
-
-        stage('Deploy') {
+       stage('Deploy') {
+            when {
+        		expression { env.HAS_CHANGES == 'Y' && env.IS_MASTER == 'N' }
+        		beforeAgent true
+      		}
             steps {
                 script {
                     pom = readMavenPom file: pomPath
