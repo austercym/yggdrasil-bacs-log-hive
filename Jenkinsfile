@@ -106,7 +106,7 @@ pipeline {
 
                 withEnv(["https_proxy=squid.service.cicd.consul:3128"]) {
                     script {
-                        rtMaven.run pom: pomPath, goals: '-U clean test -Pdeploy', buildInfo: buildInfo
+                        rtMaven.run pom: pomPath, goals: '-U clean compile test -Pdeploy', buildInfo: buildInfo
                     }
                 }
             }
