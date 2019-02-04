@@ -20,7 +20,7 @@
     </parent>
 
     <properties>
-        <storm.version.hive>1.1.3</storm.version.hive>
+        <storm.version.hive>1.2.1.3.3.0.0-165</storm.version.hive>
     </properties>
 
 
